@@ -12,5 +12,5 @@ tune2/grid_search.values = [%ABA, 999]
 test_config.g.x1 = @tune1/grid_search()
 test_config.g.x2 = @tune2/grid_search()
 
-gin_tune_config.num_workers = 0
+gin_tune_config.num_workers = 2
 tune_run.verbose = True

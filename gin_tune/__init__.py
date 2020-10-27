@@ -1,6 +1,7 @@
 from copy import deepcopy
 import gin
 from ray import tune
+from functools import partial
 
 from gin_tune.tune_funcs import OVERRIDE_ATTR, FUNCS
 from gin_tune.tune_funcs import choice, grid_search, sample_from
@@ -28,23 +29,23 @@ def gin_tune_config(**kwargs):
 
     return config
 
+def _tune_gin_wrap_inner(config, function, checkpoint_dir=None):
+    """Bind gin parameters from tune config and call function on the resulting config."""
+    gin.parse_config(config[GIN_CONFIG_ATTR])
+
+    for key, value in config.items():
+        if key.startswith(PREFIX):
+            _, scope, name = key.split('/')
+            gin.bind_parameter(scope + '/' + name + '.' + OVERRIDE_ATTR, value)
+
+    config_new = deepcopy(config)
+    del config_new[GIN_CONFIG_ATTR]
+    return function(config_new, checkpoint_dir=checkpoint_dir)
 
 def tune_gin_wrap(function):
     """Wrap around a function and process tune-gin parameters."""
 
-    def inner(config):
-
-        gin.parse_config(config[GIN_CONFIG_ATTR])
-
-        for key, value in config.items():
-            if key.startswith(PREFIX):
-                _, scope, name = key.split('/')
-                gin.bind_parameter(scope + '/' + name + '.' + OVERRIDE_ATTR, value)
-
-        config_new = deepcopy(config)
-        del config_new[GIN_CONFIG_ATTR]
-        return function(config_new)
-
+    inner = partial(_tune_gin_wrap_inner, function=function)
     inner.__name__ = function.__name__
 
     return inner
@@ -56,8 +57,9 @@ def tune_run(*args, **kwargs):
     return tune.run(*args, **kwargs)
 
 
-def tune_gin(func, **kwargs):
+def tune_gin(func, config_update=None, **kwargs):
     """Tune with gin capability."""
     func_wrapped = tune_gin_wrap(func)
-    config = gin_tune_config()
+    config = config_update if config_update else {}
+    config.update(gin_tune_config())
     return tune_run(func_wrapped, config=config, **kwargs)

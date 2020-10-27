@@ -16,14 +16,16 @@ def g(x1, x2):
     return (x1, x2)
 
 
+def fcn(config, checkpoint_dir=None):
+    """Function to run."""
+    res = g()
+    tune.report(res=res)
+
 def test_tune():
     conf_test = os.path.join(gin_tune.__path__[0], 'test.gin')
     gin.parse_config_file(conf_test)
 
-    def fcn(config):
-        """Function to run."""
-        res = g()
-        tune.report(res=res)
+
 
     # running tune
     res = tune_gin(fcn)
