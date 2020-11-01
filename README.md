@@ -1,8 +1,8 @@
-# Integration between `tune` and `gin-config`
+# Integration between [`tune`](https://docs.ray.io/en/latest/tune/index.html) and [`gin-config`](https://github.com/google/gin-config)
 [![Build Status](https://travis-ci.com/sergeivolodin/gin_tune.svg?branch=main)](https://travis-ci.com/sergeivolodin/gin_tune)
 
-It is awesome to select hyperparameters automatically with `tune`.
-It is cool to specify configuration using `gin-config`.
+It is awesome to select hyperparameters automatically with [`tune`](https://docs.ray.io/en/latest/tune/index.html).
+It is cool to specify configuration using [`gin-config`](https://github.com/google/gin-config).
 
 It is even better to specify parameters for your tune runs via gin!
 
