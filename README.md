@@ -1,4 +1,5 @@
 # Integration between `tune` and `gin-config`
+[![Build Status](https://travis-ci.com/sergeivolodin/gin_tune.svg?branch=main)](https://travis-ci.com/sergeivolodin/gin_tune)
 
 It is awesome to select hyperparameters automatically with `tune`.
 It is cool to specify configuration using `gin-config`.
