@@ -1,4 +1,4 @@
-import gin_tune.test_config
+import gin_tune_tests.test_config
 import gin_tune
 
 ABA = 'caba'

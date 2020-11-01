@@ -10,7 +10,7 @@ setup(
     license = "BSD",
     keywords = "gin gin-config tune ray",
     url = "https://github.com/sergeivolodin/gin_tune",
-    packages=['gin_tune'],
+    packages=['gin_tune', 'gin_tune_tests'],
     install_requires=['ray[tune]', 'gin-config', 'pytest'],
     classifiers=[
         "License :: OSI Approved :: BSD License",

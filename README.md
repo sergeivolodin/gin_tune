@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
 Run `python tune.py`. Should print `[135, 468, 912, 1245]`.
 
-Files `test_config.py` and `test.gin` contain a more complicated example.
+Files `test_config.py` and `test.gin` in the `gin_tune_tests` folder contain a more complicated example.
 
 ### Tests
 Just run `pytest`

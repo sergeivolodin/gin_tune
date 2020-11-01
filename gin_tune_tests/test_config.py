@@ -22,7 +22,7 @@ def fcn(config, checkpoint_dir=None):
     tune.report(res=res)
 
 def test_tune():
-    conf_test = os.path.join(gin_tune.__path__[0], 'test.gin')
+    conf_test = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test.gin')
     gin.parse_config_file(conf_test)
 
 
