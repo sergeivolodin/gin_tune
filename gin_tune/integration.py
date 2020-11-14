@@ -4,7 +4,9 @@ from ray import tune
 from functools import partial
 
 from gin_tune.tune_funcs import OVERRIDE_ATTR, FUNCS
-from gin_tune.tune_funcs import choice, grid_search, sample_from
+from gin_tune.tune_funcs import register_functions
+
+register_functions()
 
 PREFIX = 'gin_tune'
 GIN_CONFIG_ATTR = '_gin_config'
@@ -58,6 +60,7 @@ def tune_run(*args, **kwargs):
     return tune.run(*args, **kwargs)
 
 
+@gin.configurable
 def tune_gin(func, config_update=None, **kwargs):
     """Tune with gin capability."""
     func_wrapped = tune_gin_wrap(func)

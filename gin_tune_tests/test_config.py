@@ -25,8 +25,6 @@ def test_tune():
     conf_test = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test.gin')
     gin.parse_config_file(conf_test)
 
-
-
     # running tune
     res = tune_gin(fcn)
 
