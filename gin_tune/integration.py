@@ -26,7 +26,7 @@ def gin_tune_config(**kwargs):
             full_fcn_name = f['orig'].__module__ + '.' + fcn_name
             if fcn == full_fcn_name:
                 with gin.config_scope(scope):
-                    config[f"{PREFIX}{SEPARATOR}{scope}{SEPARATOR}{fcn_name}"] = f['gin'](pass_through=True, scope=scope)
+                    config[f"{PREFIX}{SEPARATOR}{scope}{SEPARATOR}{fcn_name}"] = f['gin'](pass_through=True, _scope=scope)
 
     config[GIN_CONFIG_ATTR] = gin.config_str()
 
@@ -40,6 +40,7 @@ def _tune_gin_wrap_inner(config, function, checkpoint_dir=None):
         if key.startswith(PREFIX):
             _, scope, name = key.split(SEPARATOR)
             gin.bind_parameter(scope + '/' + name + '.' + OVERRIDE_ATTR, value)
+            gin.bind_parameter(scope + '/' + name + '._scope', scope)
 
     config_new = deepcopy(config)
     del config_new[GIN_CONFIG_ATTR]

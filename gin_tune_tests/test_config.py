@@ -3,6 +3,7 @@ import gin_tune
 import os
 from ray import tune
 from gin_tune import tune_gin
+import logging
 
 
 @gin.configurable
@@ -18,10 +19,13 @@ def g(x1, x2):
 
 def fcn(config, checkpoint_dir=None):
     """Function to run."""
+    logging.basicConfig(level=logging.INFO)
     res = g()
     tune.report(res=res)
 
-def test_tune():
+def test_tune(caplog):
+    caplog.set_level(logging.INFO)
+    logging.basicConfig(level=logging.INFO)
     conf_test = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test.gin')
     gin.parse_config_file(conf_test)
 

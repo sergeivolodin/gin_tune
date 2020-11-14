@@ -40,12 +40,12 @@ def register_module(module):
 def make_override(func_name):
     """Return a function which returns OVERRIDE_ATTR or returns an error."""
     
-    def override(pass_through=False, scope="", **kwargs):
+    def override(pass_through=False, _scope="", **kwargs):
         if OVERRIDE_ATTR in kwargs:
-            logging.info(f"gin_tune: selected value for @{scope}/{func_name}: {kwargs[OVERRIDE_ATTR]}")
+            logging.info(f"gin_tune: selected value for @{_scope}/{func_name}: {kwargs[OVERRIDE_ATTR]}")
             return kwargs[OVERRIDE_ATTR]
         elif pass_through:
-            logging.info(f"gin_tune: passing arguments for @{scope}/{func_name}: {kwargs}")
+            logging.info(f"gin_tune: passing arguments for @{_scope}/{func_name}: {kwargs}")
             return FUNCS[func_name]['orig'](**kwargs)
         else:
             raise ValueError(OVERRIDE_ERROR.format(scope=gin.current_scope(),
