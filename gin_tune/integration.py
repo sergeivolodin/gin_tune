@@ -8,8 +8,8 @@ from gin_tune.tune_funcs import register_functions
 
 register_functions()
 
-PREFIX = 'gin_tune'
-GIN_CONFIG_ATTR = '_gin_config'
+PREFIX = '_gin'
+GIN_CONFIG_ATTR = 'config_gin'
 SEPARATOR = '__'
 
 
@@ -23,10 +23,10 @@ def gin_tune_config(**kwargs):
 
         # loop over functions
         for fcn_name, f in FUNCS.items():
-            full_fcn_name = f.__module__ + '.' + fcn_name
+            full_fcn_name = f['orig'].__module__ + '.' + fcn_name
             if fcn == full_fcn_name:
-                f = getattr(tune, fcn_name)
-                config[f"{PREFIX}{SEPARATOR}{scope}{SEPARATOR}{fcn_name}"] = f(**args)
+                with gin.config_scope(scope):
+                    config[f"{PREFIX}{SEPARATOR}{scope}{SEPARATOR}{fcn_name}"] = f['gin'](pass_through=True, scope=scope)
 
     config[GIN_CONFIG_ATTR] = gin.config_str()
 

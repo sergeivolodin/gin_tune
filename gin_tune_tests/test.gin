@@ -6,8 +6,10 @@ ABA = 'caba'
 scope1/test_config.f.x = 123
 scope2/test_config.f.x = 456
 
+identity/test_config.f.x = [%ABA, 999]
+
 tune1/grid_search.values = [@scope1/test_config.f(), @scope2/test_config.f()]
-tune2/grid_search.values = [%ABA, 999]
+tune2/grid_search.values = @identity/test_config.f()
 
 test_config.g.x1 = @tune1/grid_search()
 test_config.g.x2 = @tune2/grid_search()

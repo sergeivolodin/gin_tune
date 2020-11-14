@@ -2,6 +2,8 @@ import ray.tune as tune
 import gin
 import types
 from functools import partial
+import logging
+
 
 # function argument the value of which the function returns
 OVERRIDE_ATTR = '_override'
@@ -24,7 +26,7 @@ def register_func(f, func_name=None):
     override = make_override(func_name)
     f_gin = gin.configurable(func_name, module=f.__module__)(override)
         
-    FUNCS[func_name] = f
+    FUNCS[func_name] = {'orig': f, 'gin': f_gin}
     return f
 
 def register_module(module):
@@ -38,9 +40,13 @@ def register_module(module):
 def make_override(func_name):
     """Return a function which returns OVERRIDE_ATTR or returns an error."""
     
-    def override(**kwargs):
+    def override(pass_through=False, scope="", **kwargs):
         if OVERRIDE_ATTR in kwargs:
+            logging.info(f"gin_tune: selected value for @{scope}/{func_name}: {kwargs[OVERRIDE_ATTR]}")
             return kwargs[OVERRIDE_ATTR]
+        elif pass_through:
+            logging.info(f"gin_tune: passing arguments for @{scope}/{func_name}: {kwargs}")
+            return FUNCS[func_name]['orig'](**kwargs)
         else:
             raise ValueError(OVERRIDE_ERROR.format(scope=gin.current_scope(),
                                                    func_name=func_name,
