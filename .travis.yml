@@ -8,4 +8,4 @@ install:
   - pip install -e .
 # command to run tests
 script:
-  - test.sh
+  - ./test.sh
