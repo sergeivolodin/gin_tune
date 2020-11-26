@@ -9,7 +9,6 @@ from gin_tune.tune_funcs import register_functions
 register_functions()
 
 PREFIX = '_gin'
-GIN_CONFIG_ATTR = 'config_gin'
 SEPARATOR = '__'
 
 
@@ -28,13 +27,11 @@ def gin_tune_config(**kwargs):
                 with gin.config_scope(scope):
                     config[f"{PREFIX}{SEPARATOR}{scope}{SEPARATOR}{fcn_name}"] = f['gin'](pass_through=True, _scope=scope)
 
-    config[GIN_CONFIG_ATTR] = gin.config_str()
-
     return config
 
-def _tune_gin_wrap_inner(config, function, checkpoint_dir=None):
+def _tune_gin_wrap_inner(config, function, checkpoint_dir=None, gin_config_str=None):
     """Bind gin parameters from tune config and call function on the resulting config."""
-    gin.parse_config(config[GIN_CONFIG_ATTR])
+    gin.parse_config(gin_config_str)
 
     for key, value in config.items():
         if key.startswith(PREFIX):
@@ -42,14 +39,12 @@ def _tune_gin_wrap_inner(config, function, checkpoint_dir=None):
             gin.bind_parameter(scope + '/' + name + '.' + OVERRIDE_ATTR, value)
             gin.bind_parameter(scope + '/' + name + '._scope', scope)
 
-    config_new = deepcopy(config)
-    del config_new[GIN_CONFIG_ATTR]
-    return function(config_new, checkpoint_dir=checkpoint_dir)
+    return function(config, checkpoint_dir=checkpoint_dir)
 
-def tune_gin_wrap(function):
+def tune_gin_wrap(function, gin_config_str):
     """Wrap around a function and process tune-gin parameters."""
 
-    inner = partial(_tune_gin_wrap_inner, function=function)
+    inner = partial(_tune_gin_wrap_inner, function=function, gin_config_str=gin_config_str)
     inner.__name__ = function.__name__
 
     return inner
@@ -64,7 +59,8 @@ def tune_run(*args, **kwargs):
 @gin.configurable
 def tune_gin(func, config_update=None, **kwargs):
     """Tune with gin capability."""
-    func_wrapped = tune_gin_wrap(func)
+    gin_config_str = gin.config_str()
+    func_wrapped = tune_gin_wrap(func, gin_config_str=gin_config_str)
     config = config_update if config_update else {}
     config.update(gin_tune_config())
     return tune_run(func_wrapped, config=config, **kwargs)
