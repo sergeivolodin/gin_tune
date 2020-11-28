@@ -29,8 +29,11 @@ def gin_tune_config(**kwargs):
 
     return config
 
-def _tune_gin_wrap_inner(config, function, checkpoint_dir=None, gin_config_str=None):
+def _tune_gin_wrap_inner(config, function, checkpoint_dir=None, gin_config_str=None, pre_parse=None):
     """Bind gin parameters from tune config and call function on the resulting config."""
+    if callable(pre_parse):
+        pre_parse()
+
     gin.parse_config(gin_config_str)
 
     for key, value in config.items():
@@ -41,10 +44,11 @@ def _tune_gin_wrap_inner(config, function, checkpoint_dir=None, gin_config_str=N
 
     return function(config, checkpoint_dir=checkpoint_dir)
 
-def tune_gin_wrap(function, gin_config_str):
+def tune_gin_wrap(function, pre_parse, gin_config_str):
     """Wrap around a function and process tune-gin parameters."""
 
-    inner = partial(_tune_gin_wrap_inner, function=function, gin_config_str=gin_config_str)
+    inner = partial(_tune_gin_wrap_inner, function=function, pre_parse=pre_parse,
+                    gin_config_str=gin_config_str)
     inner.__name__ = function.__name__
 
     return inner
@@ -57,10 +61,10 @@ def tune_run(*args, **kwargs):
 
 
 @gin.configurable
-def tune_gin(func, config_update=None, **kwargs):
+def tune_gin(func, config_update=None, pre_parse=None, **kwargs):
     """Tune with gin capability."""
     gin_config_str = gin.config_str()
-    func_wrapped = tune_gin_wrap(func, gin_config_str=gin_config_str)
+    func_wrapped = tune_gin_wrap(func, pre_parse=pre_parse, gin_config_str=gin_config_str)
     config = config_update if config_update else {}
     config.update(gin_tune_config())
     return tune_run(func_wrapped, config=config, **kwargs)
