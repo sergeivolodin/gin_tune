@@ -37,12 +37,21 @@ def register_module(module):
         if not obj.__module__.startswith("ray"): continue
         register_func(obj, func_name=func_name)
 
+LOGGED = set()
+def log_once(msg):
+    """Log something only once."""
+    if msg in LOGGED:
+        return
+    LOGGED.add(msg)
+    logging.info(msg)
+
 def make_override(func_name):
     """Return a function which returns OVERRIDE_ATTR or returns an error."""
     
     def override(pass_through=False, _scope="", **kwargs):
         if OVERRIDE_ATTR in kwargs:
-            logging.info(f"gin_tune: selected value for @{_scope}/{func_name}: {kwargs[OVERRIDE_ATTR]}")
+
+            log_once(f"gin_tune: selected value for @{_scope}/{func_name}: {kwargs[OVERRIDE_ATTR]}")
             return kwargs[OVERRIDE_ATTR]
         elif pass_through:
             logging.info(f"gin_tune: passing arguments for @{_scope}/{func_name}: {kwargs}")
